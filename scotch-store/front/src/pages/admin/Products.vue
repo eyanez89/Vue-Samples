@@ -1,46 +1,44 @@
 <template>
-  <form @submit.prevent="saveProduct">
-    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" placeholder="Name" v-model="model.name" v-validate="'required'" name="name" :class="{'form-control': true, 'error': errors.has('name') }" />
-        <span class="small text-danger" v-show="errors.has('name')">Name is required</span>
-      </div>
-      <div class="form-group">
-        <label>Price</label>
-        <input type="number" class="form-control" placeholder="Price" v-model="model.price" v-validate="'required'" name="price" :class="{'form-control': true, 'error': errors.has('price') }" />
-        <span class="small text-danger" v-show="errors.has('price')">Price is required</span>
-      </div>
-      <div class="form-group">
-
-        <label>Manufacturer</label>
-        <select type="text" class="form-control" v-model="model.manufacturer" v-validate="'required'" name="manufacturer" :class="{'form-control': true, 'error': errors.has('manufacturer') }">
-          <template v-for="manufacturer in manufacturers">
-            <option :value="manufacturer._id" :selected="manufacturer._id == (model.manufacturer && model.manufacturer._id)">{{manufacturer.name}}</option>
-          </template>
-        </select>
-        <span class="small text-danger" v-show="errors.has('manufacturer')">Manufacturer is required</span>
-      </div>
-    </div>
-
-    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-      <div class="form-group">
-        <label>Image</label>
-        <input type="text" lass="form-control" placeholder="Image" v-model="model.image" v-validate="'required|url'" name="image" :class="{'form-control': true, 'error': errors.has('image') }" />
-        <span class="small text-danger" v-show="errors.has('image')">Image is required and must be a valid URL</span>
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea type="number" class="form-control" placeholder="Description" rows="5" v-model="model.description" v-validate="'required'" name="description" :class="{'form-control': true, 'error': errors.has('description') }"></textarea>
-        <span class="small text-danger" v-show="errors.has('description')">Description is required</span>
-      </div>
-      <div class="form-group new-button">
-        <button class="button">
-          <i class="fa fa-pencil"></i>
-          <span v-if="isEditing">Update Product</span>
-          <span v-else>Add Product</span>
-        </button>
-      </div>
-    </div>
-  </form>
+    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Manufacturer</th>
+              <th></th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="product in products" :key="product.id">
+              <td>{{product.name}}</td>
+              <td>${{product.price}}</td>
+              <td>{{product.manufacturer.name}}</td>
+              <td><router-link :to="'/admin/edit/'+product._id"><i class="fa fa-pencil-square-o"></i></router-link></td>
+              <td><a @click="deleteProduct(product._id)" ><i class="fa fa-trash"></i></a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
 </template>
+
+<script>
+  export default {
+    computed: {
+      products () {
+        return this.$store.getters.allProducts
+      }
+    },
+    created () {
+      if (this.products.length === 0) {
+        this.$store.dispatch('allProducts')
+      }
+    },
+    methods: {
+      deleteProduct (id) {
+        this.$store.dispatch('removeProduct', id)
+      }
+    }
+  }
+</script>
